@@ -5,6 +5,8 @@ import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The {@code AlertGenerator} class is responsible for monitoring patient data
@@ -82,6 +84,7 @@ public class AlertGenerator {
      * @param alert the alert object containing details about the alert condition
      */
     private void triggerAlert(Alert alert) {
-        // Implementation might involve logging the alert or notifying staff
+        Logger logger = Logger.getLogger(AlertGenerator.class.getName());
+        logger.log(Level.SEVERE, alert.getPatientId() + ": " + alert.getCondition() + ", at " + alert.getTimestamp());
     }
 }
