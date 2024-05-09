@@ -1,6 +1,8 @@
 //package data_management;
 //
 //import static org.junit.jupiter.api.Assertions.*;
+//
+//import com.data_management.DataReader;
 //import org.junit.jupiter.api.Test;
 //
 //import com.data_management.DataStorage;
@@ -9,10 +11,16 @@
 //import java.util.List;
 //
 //class DataStorageTest {
-//
+//public DataStorage dataStorage;
+//public DataReader reader;
+//    public DataStorageTest(DataStorage storage) {
+//        this.dataStorage = storage;
+//        // TODO Auto-generated constructor stub
+//    }
 //    @Test
 //    void testAddAndGetRecords() {
 //        // TODO Perhaps you can implement a mock data reader to mock the test data?
+//
 //        // DataReader reader
 //        DataStorage storage = new DataStorage(reader);
 //        storage.addPatientData(1, 100.0, "WhiteBloodCells", 1714376789050L);
