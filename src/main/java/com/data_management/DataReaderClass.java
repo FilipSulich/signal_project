@@ -1,6 +1,8 @@
 package com.data_management;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DataReaderClass implements DataReader{
     private String directoryPath;
@@ -26,8 +28,8 @@ public class DataReaderClass implements DataReader{
                             long timeStamp = Long.parseLong(data[4].substring(0, data[4].length() - 1));
                             dataStorage.addPatientData(patientID, measurementValue, recordType, timeStamp);
                         }
+                        reader.close();
                     }
-                reader.close();
             }
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());

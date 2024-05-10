@@ -34,8 +34,8 @@ public class DataReaderTest {
         Files.write(mockFile1, mockLines1);
 
         List<String> mockLines2 = new ArrayList<>() ;
-        mockLines1.add("Patient ID: 3, Timestamp: 1715269830535, Label: DiastolicPressure, Data: 90.0");
-        mockLines1.add("Patient ID: 4, Timestamp: 1715269830535, Label: SystolicPressure, Data: 100.0");
+        mockLines2.add("Patient ID: 3, Timestamp: 1715269830535, Label: DiastolicPressure, Data: 90.0");
+        mockLines2.add("Patient ID: 4, Timestamp: 1715269830535, Label: SystolicPressure, Data: 100.0");
         Files.write(mockFile2, mockLines2);
 
         DataStorage dataStorage = new DataStorage();
@@ -48,15 +48,16 @@ public class DataReaderTest {
 
         List<PatientRecord> records2 = dataStorage.getRecords(2,1700000000000L, 1800000000000L);
         assertEquals(80.0, records2.get(0).getMeasurementValue());
-        assertEquals("SystolicPressure", records1.get(0).getRecordType());
+        assertEquals("SystolicPressure", records2.get(0).getRecordType());
 
         List<PatientRecord> records3 = dataStorage.getRecords(3,1700000000000L, 1800000000000L);
+        assertEquals(1, records3.size());
         assertEquals(90.0, records3.get(0).getMeasurementValue());
-        assertEquals("DiastolicPressure", records1.get(0).getRecordType());
+        assertEquals("DiastolicPressure", records3.get(0).getRecordType());
 
         List<PatientRecord> records4 = dataStorage.getRecords(4,1700000000000L, 1800000000000L);
         assertEquals(100.0, records4.get(0).getMeasurementValue());
-        assertEquals("SystolicPressure", records1.get(0).getRecordType());
+        assertEquals("SystolicPressure", records4.get(0).getRecordType());
 
     }
 
