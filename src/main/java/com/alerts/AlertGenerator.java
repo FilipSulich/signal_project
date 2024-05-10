@@ -14,34 +14,11 @@ import java.util.logging.Logger;
  * relies on a {@link DataStorage} instance to access patient data and evaluate
  * it against specific health criteria.
  */
+
+
 public class AlertGenerator {
     private DataStorage dataStorage;
 
-    public static void main(String[] args) {
-        DataStorage dataStorage = new DataStorage();
-        AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
-        Patient patient = new Patient(123);
-        PatientRecord record1 = new PatientRecord(123, 100, "SystolicPressure", 1714376789050L);
-        PatientRecord record01 = new PatientRecord(123, 110, "SystolicPressure", 1714376789050L);
-        PatientRecord record02 = new PatientRecord(123, 120, "SystolicPressure", 1714376789050L);
-        PatientRecord record2 = new PatientRecord(123, 90, "DiastolicPressure", 1714376789051L);
-        PatientRecord record3 = new PatientRecord(123, 91, "Saturation", 1714376789052L);
-        PatientRecord record4 = new PatientRecord(123, 99, "Saturation", 1714376789053L);
-        PatientRecord record5 = new PatientRecord(123, 100, "ECG", 1714376789054L);
-        PatientRecord record6 = new PatientRecord(123, 50, "ECG", 1714376789055L);
-        PatientRecord record7 = new PatientRecord(123, 100, "ECG", 1714376789056L);
-        patient.addRecord(record1.getMeasurementValue(), record1.getRecordType(), record1.getTimestamp());
-        patient.addRecord(record01.getMeasurementValue(), record01.getRecordType(), record01.getTimestamp());
-        patient.addRecord(record02.getMeasurementValue(), record02.getRecordType(), record02.getTimestamp());
-        patient.addRecord(record2.getMeasurementValue(), record2.getRecordType(), record2.getTimestamp());
-        patient.addRecord(record3.getMeasurementValue(), record3.getRecordType(), record3.getTimestamp());
-        patient.addRecord(record4.getMeasurementValue(), record4.getRecordType(), record4.getTimestamp());
-        patient.addRecord(record5.getMeasurementValue(), record5.getRecordType(), record5.getTimestamp());
-        patient.addRecord(record6.getMeasurementValue(), record6.getRecordType(), record6.getTimestamp());
-        patient.addRecord(record7.getMeasurementValue(), record7.getRecordType(), record7.getTimestamp());
-        String alert = alertGenerator.evaluateDataString(patient);
-        System.out.println(alert);
-    }
     /**
      * Constructs an {@code AlertGenerator} with a specified {@code DataStorage}.
      * The {@code DataStorage} is used to retrieve patient data that this class
@@ -71,7 +48,6 @@ public class AlertGenerator {
         double previousPressure = 0;
         double previousSaturation = 0;
 
-        String result = "";
         for(PatientRecord record : records) {
             String recordType = record.getRecordType();
             double measurementValue = record.getMeasurementValue();
@@ -84,9 +60,7 @@ public class AlertGenerator {
                     triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Critical pressure detected", record.getTimestamp()));
                 }
                 if(previousRecord != null && twoRecordsAgo != null && (previousRecord.getRecordType().equals("SystolicPressure") || previousRecord.getRecordType().equals("DiastolicPressure") && (twoRecordsAgo.getRecordType().equals("SystolicPressure") || twoRecordsAgo.getRecordType().equals("DiastolicPressure")))){
-                    System.out.println("Trend in blood pressure detected");
                     if (Math.abs((measurementValue - previousRecord.getMeasurementValue())) >= 10 && Math.abs(previousRecord.getMeasurementValue() - twoRecordsAgo.getMeasurementValue()) >= 10) {
-                        System.out.println("123123123");
                         triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Trend in blood pressure detected", record.getTimestamp()));
                     }
                 }
@@ -139,9 +113,7 @@ public class AlertGenerator {
                     result = "Critical pressure detected";
                 }
                 if(previousRecord != null && twoRecordsAgo != null && (previousRecord.getRecordType().equals("SystolicPressure") || previousRecord.getRecordType().equals("DiastolicPressure") && (twoRecordsAgo.getRecordType().equals("SystolicPressure") || twoRecordsAgo.getRecordType().equals("DiastolicPressure")))){
-                    System.out.println("Trend in blood pressure detected");
                     if (Math.abs((measurementValue - previousRecord.getMeasurementValue())) >= 10 && Math.abs(previousRecord.getMeasurementValue() - twoRecordsAgo.getMeasurementValue()) >= 10) {
-                        System.out.println("123123123");
                         triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Trend in blood pressure detected", record.getTimestamp()));
                         result = "Trend in blood pressure detected";
                     }
