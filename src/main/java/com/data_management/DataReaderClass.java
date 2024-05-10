@@ -1,8 +1,6 @@
 package com.data_management;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class DataReaderClass implements DataReader{
     private String directoryPath;
