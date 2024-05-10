@@ -21,7 +21,9 @@ public class AlertGenerator {
         DataStorage dataStorage = new DataStorage();
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
         Patient patient = new Patient(123);
-        PatientRecord record1 = new PatientRecord(123, 80, "SystolicPressure", 1714376789050L);
+        PatientRecord record1 = new PatientRecord(123, 100, "SystolicPressure", 1714376789050L);
+        PatientRecord record01 = new PatientRecord(123, 110, "SystolicPressure", 1714376789050L);
+        PatientRecord record02 = new PatientRecord(123, 120, "SystolicPressure", 1714376789050L);
         PatientRecord record2 = new PatientRecord(123, 90, "DiastolicPressure", 1714376789051L);
         PatientRecord record3 = new PatientRecord(123, 91, "Saturation", 1714376789052L);
         PatientRecord record4 = new PatientRecord(123, 99, "Saturation", 1714376789053L);
@@ -29,6 +31,8 @@ public class AlertGenerator {
         PatientRecord record6 = new PatientRecord(123, 50, "ECG", 1714376789055L);
         PatientRecord record7 = new PatientRecord(123, 100, "ECG", 1714376789056L);
         patient.addRecord(record1.getMeasurementValue(), record1.getRecordType(), record1.getTimestamp());
+        patient.addRecord(record01.getMeasurementValue(), record01.getRecordType(), record01.getTimestamp());
+        patient.addRecord(record02.getMeasurementValue(), record02.getRecordType(), record02.getTimestamp());
         patient.addRecord(record2.getMeasurementValue(), record2.getRecordType(), record2.getTimestamp());
         patient.addRecord(record3.getMeasurementValue(), record3.getRecordType(), record3.getTimestamp());
         patient.addRecord(record4.getMeasurementValue(), record4.getRecordType(), record4.getTimestamp());
@@ -64,37 +68,51 @@ public class AlertGenerator {
         List<PatientRecord> records = patient.getRecords(1700000000000L, 1800000000000L);
         PatientRecord previousRecord = null;
         PatientRecord twoRecordsAgo = null;
+        double previousPressure = 0;
+        double previousSaturation = 0;
 
-        System.out.println(records.size());
+        String result = "";
         for(PatientRecord record : records) {
-            if(previousRecord != null && previousRecord.getRecordType().equals("SystolicPressure") && previousRecord.getMeasurementValue() < 90 && record.getRecordType().equals("Saturation") && record.getMeasurementValue() < 92) {
-                triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Hypotensive hypoxemia detected", record.getTimestamp()));
-            }
-            if(record.getRecordType().equals("SystolicPressure") || record.getRecordType().equals("DiastolicPressure")) {
-              if((record.getRecordType().equals("SystolicPressure") && record.getMeasurementValue() > 180 || record.getMeasurementValue() < 90) || (record.getRecordType().equals("DiastolicPressure") && record.getMeasurementValue() > 120 || record.getMeasurementValue() < 60)){
-                  System.out.println("Critical pressure detected");
-                  triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Critical pressure detected", record.getTimestamp()));
+            String recordType = record.getRecordType();
+            double measurementValue = record.getMeasurementValue();
+
+            if(recordType.equals("SystolicPressure") || recordType.equals("DiastolicPressure")) {
+                if((recordType.equals("SystolicPressure") && (measurementValue > 180 || measurementValue < 90)) || (recordType.equals("DiastolicPressure") && (measurementValue > 120 || measurementValue < 60))){
+                    if(recordType.equals("SystolicPressure") && measurementValue < 90){
+                        previousPressure = measurementValue;
+                    }
+                    triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Critical pressure detected", record.getTimestamp()));
                 }
-                if(previousRecord != null && twoRecordsAgo != null &&
-                        (record.getMeasurementValue() - previousRecord.getMeasurementValue() > 10 && previousRecord.getMeasurementValue() - twoRecordsAgo.getMeasurementValue() > 10) || (record.getMeasurementValue() - previousRecord.getMeasurementValue() < -10 && (previousRecord.getMeasurementValue() - twoRecordsAgo.getMeasurementValue()) < -10)) {
-                    triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Trend in blood pressure detected", record.getTimestamp()));
+                if(previousRecord != null && twoRecordsAgo != null && (previousRecord.getRecordType().equals("SystolicPressure") || previousRecord.getRecordType().equals("DiastolicPressure") && (twoRecordsAgo.getRecordType().equals("SystolicPressure") || twoRecordsAgo.getRecordType().equals("DiastolicPressure")))){
+                    System.out.println("Trend in blood pressure detected");
+                    if (Math.abs((measurementValue - previousRecord.getMeasurementValue())) >= 10 && Math.abs(previousRecord.getMeasurementValue() - twoRecordsAgo.getMeasurementValue()) >= 10) {
+                        System.out.println("123123123");
+                        triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Trend in blood pressure detected", record.getTimestamp()));
+                    }
                 }
-            } else if(record.getRecordType().equals("Saturation")) {
-                if(record.getMeasurementValue() < 92) {
+            } else if(recordType.equals("Saturation")) {
+                if(measurementValue < 92) {
+                    previousSaturation = measurementValue;
                     triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Low blood saturation detected", record.getTimestamp()));
                 }
-                if(previousRecord != null && record.getTimestamp() - previousRecord.getTimestamp() <= 1000 * 60 * 10 && record.getMeasurementValue() - previousRecord.getMeasurementValue() < -5) {
-                    triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Rapid drop in blood saturation detected", record.getTimestamp()));
+                if(previousRecord != null && previousRecord.getRecordType().equals("Saturation")){
+                    if(record.getTimestamp() - previousRecord.getTimestamp() <= 1000 * 60 * 10 && measurementValue - previousRecord.getMeasurementValue() < -5) {
+                        triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Rapid drop in blood saturation detected", record.getTimestamp()));
+                    }
                 }
-            } else if(record.getRecordType().equals("ECG")){
-                if(record.getMeasurementValue() < 50 || record.getMeasurementValue() > 100) {
+            } else if(recordType.equals("ECG")){
+                if(measurementValue < 50 || measurementValue > 100) {
                     triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Abnormal heart rate detected", record.getTimestamp()));
                 }
-                if(previousRecord != null && Math.abs(record.getMeasurementValue() - previousRecord.getMeasurementValue()) > 10) {
-                    triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Irregular heart beat detected", record.getTimestamp()));
+                if(previousRecord != null && previousRecord.getRecordType().equals("ECG")){
+                    if(Math.abs(measurementValue - previousRecord.getMeasurementValue()) > 10) {
+                        triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Irregular heart beat detected", record.getTimestamp()));
+                    }
                 }
             }
-
+            if(previousPressure != 0 && previousSaturation != 0){
+                triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Hypotensive hypoxemia detected", record.getTimestamp()));
+            }
             twoRecordsAgo = previousRecord;
             previousRecord = record;
         }
@@ -104,50 +122,62 @@ public class AlertGenerator {
         List<PatientRecord> records = patient.getRecords(1700000000000L, 1800000000000L);
         PatientRecord previousRecord = null;
         PatientRecord twoRecordsAgo = null;
+        double previousPressure = 0;
+        double previousSaturation = 0;
+
+        String result = "";
         for(PatientRecord record : records) {
-            if(record.getRecordType().equals("SystolicPressure") && record.getMeasurementValue() < 90 && record.getRecordType().equals("Saturation") && record.getMeasurementValue() < 92) {
-                triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Hypotensive hypoxemia detected", record.getTimestamp()));
-                return "Hypotensive hypoxemia detected";
-            }
-            if(record.getRecordType().equals("SystolicPressure") || record.getRecordType().equals("DiastolicPressure")) {
-                if((record.getRecordType().equals("SystolicPressure") && record.getMeasurementValue() > 180 || record.getMeasurementValue() < 90) || (record.getRecordType().equals("DiastolicPressure") && record.getMeasurementValue() > 120 || record.getMeasurementValue() < 60)){
+            String recordType = record.getRecordType();
+            double measurementValue = record.getMeasurementValue();
+
+            if(recordType.equals("SystolicPressure") || recordType.equals("DiastolicPressure")) {
+                if((recordType.equals("SystolicPressure") && (measurementValue > 180 || measurementValue < 90)) || (recordType.equals("DiastolicPressure") && (measurementValue > 120 || measurementValue < 60))){
+                    if(recordType.equals("SystolicPressure") && measurementValue < 90){
+                        previousPressure = measurementValue;
+                    }
                     triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Critical pressure detected", record.getTimestamp()));
-                    return "Critical pressure detected";
+                    result = "Critical pressure detected";
                 }
                 if(previousRecord != null && twoRecordsAgo != null && (previousRecord.getRecordType().equals("SystolicPressure") || previousRecord.getRecordType().equals("DiastolicPressure") && (twoRecordsAgo.getRecordType().equals("SystolicPressure") || twoRecordsAgo.getRecordType().equals("DiastolicPressure")))){
-                    if (Math.abs((record.getMeasurementValue() - previousRecord.getMeasurementValue())) > 10 && Math.abs(previousRecord.getMeasurementValue() - twoRecordsAgo.getMeasurementValue()) > 10) {
+                    System.out.println("Trend in blood pressure detected");
+                    if (Math.abs((measurementValue - previousRecord.getMeasurementValue())) >= 10 && Math.abs(previousRecord.getMeasurementValue() - twoRecordsAgo.getMeasurementValue()) >= 10) {
+                        System.out.println("123123123");
                         triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Trend in blood pressure detected", record.getTimestamp()));
-                        return "Trend in blood pressure detected";
+                        result = "Trend in blood pressure detected";
                     }
                 }
-            } else if(record.getRecordType().equals("Saturation")) {
-                if(record.getMeasurementValue() < 92) {
+            } else if(recordType.equals("Saturation")) {
+                if(measurementValue < 92) {
+                    previousSaturation = measurementValue;
                     triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Low blood saturation detected", record.getTimestamp()));
-                    return "Low blood saturation detected";
+                    result = "Low blood saturation detected";
                 }
                 if(previousRecord != null && previousRecord.getRecordType().equals("Saturation")){
-                    if(record.getTimestamp() - previousRecord.getTimestamp() <= 1000 * 60 * 10 && record.getMeasurementValue() - previousRecord.getMeasurementValue() < -5) {
+                    if(record.getTimestamp() - previousRecord.getTimestamp() <= 1000 * 60 * 10 && measurementValue - previousRecord.getMeasurementValue() < -5) {
                         triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Rapid drop in blood saturation detected", record.getTimestamp()));
-                        return "Rapid drop in blood saturation detected";
+                        result = "Rapid drop in blood saturation detected";
                     }
                 }
-            } else if(record.getRecordType().equals("ECG")){
-                if(record.getMeasurementValue() < 50 || record.getMeasurementValue() > 100) {
+            } else if(recordType.equals("ECG")){
+                if(measurementValue < 50 || measurementValue > 100) {
                     triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Abnormal heart rate detected", record.getTimestamp()));
-                    return "Abnormal heart rate detected";
+                    result = "Abnormal heart rate detected";
                 }
                 if(previousRecord != null && previousRecord.getRecordType().equals("ECG")){
-                    if(Math.abs(record.getMeasurementValue() - previousRecord.getMeasurementValue()) > 10) {
+                    if(Math.abs(measurementValue - previousRecord.getMeasurementValue()) > 10) {
                         triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Irregular heart beat detected", record.getTimestamp()));
-                        return "Irregular heart beat detected";
+                        result =  "Irregular heart beat detected";
                     }
                 }
             }
-
+            if(previousPressure != 0 && previousSaturation != 0){
+                triggerAlert(new Alert(String.valueOf(record.getPatientId()), "Hypotensive hypoxemia detected", record.getTimestamp()));
+                result = "Hypotensive hypoxemia detected";
+            }
             twoRecordsAgo = previousRecord;
             previousRecord = record;
         }
-        return null;
+        return result;
     }
     /**
      * Triggers an alert for the monitoring system. This method can be extended to
