@@ -1,7 +1,7 @@
 package data_management;
 
 import com.data_management.DataReader;
-import com.data_management.DataReaderClass;
+import com.data_management.DataReaderFile;
 import com.data_management.DataStorage;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class DataReaderTest {
         Files.write(mockFile2, mockLines2);
 
         DataStorage dataStorage = new DataStorage();
-        DataReader dataReader = new DataReaderClass(mockDirectory.toString());
+        DataReader dataReader = new DataReaderFile(mockDirectory.toString());
         dataReader.readData(dataStorage);
 
         List<PatientRecord> records1 = dataStorage.getRecords(1,1700000000000L, 1800000000000L);

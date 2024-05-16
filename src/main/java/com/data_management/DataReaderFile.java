@@ -2,10 +2,10 @@ package com.data_management;
 
 import java.io.*;
 
-public class DataReaderClass implements DataReader{
+public class DataReaderFile implements DataReader{
     private String directoryPath;
 
-    public DataReaderClass(String directoryPath) {
+    public DataReaderFile(String directoryPath) {
         this.directoryPath = directoryPath;
     }
 
