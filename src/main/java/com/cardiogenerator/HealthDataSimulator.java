@@ -80,8 +80,7 @@ public class HealthDataSimulator {
                                 outputStrategy = new WebSocketOutputStrategy(port);
                                 System.out.println("WebSocket output will be on port: " + port);
                             } catch (NumberFormatException e) {
-                                System.err.println(
-                                        "Invalid port for WebSocket output. Please specify a valid port number.");
+                                System.err.println("Invalid port for WebSocket output. Please specify a valid port number.");
                             }
                         } else if (outputArg.startsWith("tcp:")) {
                             try {
