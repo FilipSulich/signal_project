@@ -1,16 +1,16 @@
 package com.data_management;
 
-import java.net.URI;
-
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+
+import java.net.URI;
 
 public class MyWebSocketClient extends WebSocketClient {
     private DataStorage dataStorage;
 
-    public MyWebSocketClient(URI serverURI, DataStorage dataStorage) {
+    public MyWebSocketClient(URI serverURI) {
         super(serverURI);
-        this.dataStorage = dataStorage;
+        this.dataStorage = DataStorage.getInstance();
     }
 
     @Override

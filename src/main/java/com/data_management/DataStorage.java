@@ -1,10 +1,12 @@
 package com.data_management;
 
+import com.alerts.generator.AlertGenerator;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.alerts.AlertGenerator;
+
 
 /**
  * Manages storage and retrieval of patient data within a healthcare monitoring
@@ -13,14 +15,22 @@ import com.alerts.AlertGenerator;
  * patient IDs.
  */
 public class DataStorage {
+    private static DataStorage instance;
     private Map<Integer, Patient> patientMap; // Stores patient objects indexed by their unique patient ID.
 
     /**
      * Constructs a new instance of DataStorage, initializing the underlying storage
      * structure.
      */
-    public DataStorage() {
+    private DataStorage() {
         this.patientMap = new HashMap<>();
+    }
+
+    public static DataStorage getInstance() {
+       if(instance == null) {
+           instance = new DataStorage();
+       }
+         return instance;
     }
 
     /**

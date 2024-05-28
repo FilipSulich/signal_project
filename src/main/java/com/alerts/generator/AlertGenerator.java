@@ -1,5 +1,6 @@
-package com.alerts;
+package com.alerts.generator;
 
+import com.alerts.Alert;
 import com.data_management.DataStorage;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
@@ -28,7 +29,7 @@ public class AlertGenerator {
      *                    data
      */
     public AlertGenerator(DataStorage dataStorage) {
-        this.dataStorage = dataStorage;
+        this.dataStorage = DataStorage.getInstance();
     }
 
     /**

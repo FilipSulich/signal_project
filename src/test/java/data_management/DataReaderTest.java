@@ -3,18 +3,17 @@ package data_management;
 import com.data_management.DataReader;
 import com.data_management.DataReaderFile;
 import com.data_management.DataStorage;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import com.data_management.PatientRecord;
-import org.junit.*;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DataReaderTest {
 
@@ -38,7 +37,7 @@ public class DataReaderTest {
         mockLines2.add("Patient ID: 4, Timestamp: 1715269830535, Label: SystolicPressure, Data: 100.0");
         Files.write(mockFile2, mockLines2);
 
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         DataReader dataReader = new DataReaderFile(mockDirectory.toString());
         dataReader.readData(dataStorage);
 

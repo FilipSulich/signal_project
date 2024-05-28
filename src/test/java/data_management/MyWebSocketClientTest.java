@@ -3,16 +3,14 @@ package data_management;
 import com.cardiogenerator.outputs.WebSocketOutputStrategy;
 import com.data_management.DataStorage;
 import com.data_management.MyWebSocketClient;
-import com.data_management.Patient;
 import com.data_management.PatientRecord;
 import org.junit.Test;
-import org.junit.*;
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 
 import java.net.URI;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MyWebSocketClientTest {
     public MyWebSocketClient myWebSocketClient;
@@ -23,10 +21,10 @@ public class MyWebSocketClientTest {
     @Test
     @DisplayName("Correct addition to dataStorage test")
     public void testOnMessage() throws Exception {
-        DataStorage mockDataStorage = new DataStorage();
+        DataStorage mockDataStorage = DataStorage.getInstance();
         server = new WebSocketOutputStrategy(8888);
         Thread.sleep(1000);
-        myWebSocketClient = new MyWebSocketClient(new URI("ws://localhost:8888"), mockDataStorage);
+        myWebSocketClient = new MyWebSocketClient(new URI("ws://localhost:8888"));
         myWebSocketClient.connect();
         Thread.sleep(1000);
         server.output(1, 1715269830535L, "Saturation", "90%");
@@ -43,9 +41,9 @@ public class MyWebSocketClientTest {
     @Test
     @DisplayName("Data format test")
     public void testDataFormat() throws Exception{
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         server = new WebSocketOutputStrategy(8080);
-        myWebSocketClient = new MyWebSocketClient(new URI("ws://localhost:8080"), mockDataStorage);
+        myWebSocketClient = new MyWebSocketClient(new URI("ws://localhost:8080"));
 
         server.output(123, 1727947323000L, "Error", "90%");
         List<PatientRecord> invalidRecords = dataStorage.getRecords(123, 1727947200000L, 1827947323000L);
