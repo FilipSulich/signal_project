@@ -1,6 +1,7 @@
 package data_management;
 
 import com.alerts.strategy.BloodPressureStrategy;
+import com.alerts.strategy.OxygenSaturationStrategy;
 import com.data_management.Patient;
 import org.junit.Test;
 
@@ -60,4 +61,23 @@ public class AlertStrategyTest {
         BloodPressureStrategy bloodPressureStrategy = new BloodPressureStrategy();
         assertTrue(bloodPressureStrategy.checkAlert(patient));
     }
+
+    @Test
+    public void saturationChange(){
+        Patient patient = new Patient(7);
+        patient.addRecord(90, "Saturation", 1750000000000L);
+        patient.addRecord(84, "Saturation", 1750000000000L);
+        patient.addRecord(79, "Saturation", 1750000000000L);
+        OxygenSaturationStrategy ox = new OxygenSaturationStrategy();
+        assertTrue(ox.checkAlert(patient));
+    }
+
+    @Test
+    public void saturationLow(){
+        Patient patient = new Patient(8);
+        patient.addRecord(80, "Saturation", 1750000000000L);
+        OxygenSaturationStrategy ox = new OxygenSaturationStrategy();
+        assertTrue(ox.checkAlert(patient));
+    }
+
 }
