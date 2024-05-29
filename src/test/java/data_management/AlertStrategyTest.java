@@ -1,10 +1,15 @@
 package data_management;
 
+import com.alerts.Alert;
+import com.alerts.decorator.PriorityAlertDecorator;
+import com.alerts.decorator.RepeatedAlertDecorator;
 import com.alerts.strategy.BloodPressureStrategy;
 import com.alerts.strategy.OxygenSaturationStrategy;
 import com.data_management.Patient;
+import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -80,4 +85,17 @@ public class AlertStrategyTest {
         assertTrue(ox.checkAlert(patient));
     }
 
+    @Test
+    public void alertPriorityTest(){
+        Alert alert = new Alert("1", "Saturation", 1750000000000L);
+        PriorityAlertDecorator priorityAlert = new PriorityAlertDecorator(alert, 3);
+        Assert.assertEquals(3, priorityAlert.getPriority());
+    }
+
+    @Test
+    public void alertRepeatedTest(){
+        Alert alert = new Alert("1", "Saturation", 1750000000000L);
+        RepeatedAlertDecorator priorityAlert = new RepeatedAlertDecorator(alert, 3);
+        Assert.assertEquals(3, priorityAlert.getRepeatCount());
+    }
 }

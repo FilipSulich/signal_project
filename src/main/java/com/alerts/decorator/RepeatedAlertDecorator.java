@@ -14,4 +14,8 @@ public class RepeatedAlertDecorator extends AlertDecorator{
     public String getCondition() {
         return alert.getCondition() + " (repeated " + repeatCount + " times)";
     }
+
+    public int getRepeatCount() {
+        return repeatCount;
+    }
 }
